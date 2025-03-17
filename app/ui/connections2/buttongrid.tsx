@@ -120,10 +120,12 @@ const ButtonGrid = () => {
                 {order.map((boxNumber, index) => {
                     // Check if it's a "complete" box in the order array
                     const isActive = activeBoxes.includes(boxNumber);
+                    const isCategory = boxNumber <= 0
                     return (
                         <button
                             key={boxNumber}
-                            className={`${styles.box} ${isActive ? styles.active : ""}`}
+                            // className={`${styles.box} ${isActive ? styles.active : ""} ${isCategory ? styles.completeRow : ""}`}
+                            className={`${isActive ? styles.active : ""} ${isCategory ? styles.completeRow : styles.box}`}
                             onClick={() => toggleBox(boxNumber)}
                         >
                             box{boxNumber}
