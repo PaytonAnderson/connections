@@ -1,0 +1,111 @@
+.container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    /* 4 equal columns */
+    grid-template-rows: repeat(4, 1fr);
+    /* 4 equal rows */
+    gap: 10px;
+    /* Adds space between squares */
+    width: 400px;
+    /* Adjust width as needed */
+    height: 400px;
+    /* Adjust height as needed */
+    margin: auto;
+    /* Centers the grid */
+    grid-template-areas:
+        "topRow topRow topRow topRow"
+        "box1 box2 box3 box4"
+        "box5 box6 box7 box8"
+        "box9 box10 box11 box12";
+    /* Dynamically replace topRow with completeRow */
+}
+
+.box {
+    background-color: #efefe6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    color: black;
+    cursor: pointer;
+    /* Makes the squares clickable */
+    border: none;
+    transition: background-color 0.3s;
+}
+
+.box:hover {
+    background-color: #5a594e;
+    /* Changes color on hover */
+}
+
+.active {
+    background-color: #5a594e;
+    color: white
+}
+
+.label {
+    text-align: center;
+}
+
+.submitContainer {
+    display: flex;
+    justify-content: center;
+    /* Center horizontally */
+    align-items: center;
+    /* Center vertically (optional) */
+    height: 100%;
+    /* Ensure it takes full height of the container */
+    margin-top: 20px;
+    /* Optional: Add spacing from the content above */
+}
+
+.submitButton {
+    margin-top: 20px;
+    /* Add some space between the grid and the button */
+    margin-left: 10px;
+    padding: 10px 20px;
+    /* Adjust padding as needed */
+    background-color: #4CAF50;
+    /* Green background (you can change this) */
+    color: white;
+    /* Text color */
+    font-size: 16px;
+    /* Font size */
+    border: none;
+    /* Remove border */
+    border-radius: 5px;
+    /* Optional rounded corners */
+    cursor: pointer;
+    /* Change cursor to pointer when hovering */
+    transition: background-color 0.3s ease;
+    /* Smooth background change on hover */
+}
+
+.submitButton:hover {
+    background-color: #45a049;
+    /* Darker green on hover */
+}
+
+.submitButton:disabled {
+    background-color: #ccc;
+    /* Light gray background when disabled */
+    cursor: not-allowed;
+    /* Change cursor to indicate it's not clickable */
+    opacity: 0.5;
+    /* Slightly transparent */
+}
+
+.completeRow {
+    grid-column: 1 / -1;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 5px;
+}

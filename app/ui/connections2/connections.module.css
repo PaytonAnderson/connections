@@ -1,0 +1,25 @@
+.label {
+    text-align: center;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    /* 4 equal columns */
+    grid-template-rows: repeat(4, 1fr);
+    /* 4 equal rows */
+    gap: 10px;
+    /* Adds space between squares */
+    width: 400px;
+    /* Adjust width as needed */
+    height: 400px;
+    /* Adjust height as needed */
+    margin: auto;
+    /* Centers the grid */
+    grid-template-areas:
+        "topRow topRow topRow topRow"
+        "box1 box2 box3 box4"
+        "box5 box6 box7 box8"
+        "box9 box10 box11 box12";
+    /* Dynamically replace topRow with completeRow */
+}
