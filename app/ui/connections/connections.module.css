@@ -1,3 +1,7 @@
+.label {
+    text-align: center;
+}
+
 .container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -13,11 +17,10 @@
     margin: auto;
     /* Centers the grid */
     grid-template-areas:
-        "topRow topRow topRow topRow"
         "box1 box2 box3 box4"
         "box5 box6 box7 box8"
-        "box9 box10 box11 box12";
-    /* Dynamically replace topRow with completeRow */
+        "box9 box10 box11 box12"
+        "box13 box14 box15 box16";
 }
 
 .box {
@@ -26,13 +29,26 @@
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 20px;
+    font-size: 15px;
     font-weight: bold;
     color: black;
     cursor: pointer;
     /* Makes the squares clickable */
     border: none;
     transition: background-color 0.3s;
+    min-width: 80px;
+    /* Minimum size */
+    max-width: 150px;
+    /* Prevents growing too large */
+    aspect-ratio: 1 / 1;
+    /* Maintains a square shape */
+    word-break: break-all;
+    word-wrap: break-word;
+    /* Ensures text wraps if needed */
+
+    transition: transform 0.1s ease;
+    /* Smooth animation */
+    transform-origin: center;
 }
 
 .box:hover {
@@ -40,13 +56,41 @@
     /* Changes color on hover */
 }
 
+.box:active {
+    transform: scale(.9);
+}
+
 .active {
     background-color: #5a594e;
     color: white
 }
 
-.label {
-    text-align: center;
+.completeRow {
+    grid-column: 1 / -1;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+.yellow {
+    background-color: rgb(201, 201, 31);
+}
+
+.green {
+    background-color: #4CAF50;
+}
+
+.blue {
+    background-color: lightblue;
+}
+
+.purple {
+    background-color: purple;
 }
 
 .submitContainer {
@@ -95,17 +139,4 @@
     /* Change cursor to indicate it's not clickable */
     opacity: 0.5;
     /* Slightly transparent */
-}
-
-.completeRow {
-    grid-column: 1 / -1;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #4CAF50;
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-    border-radius: 5px;
 }

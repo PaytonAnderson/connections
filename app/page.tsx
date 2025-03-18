@@ -2,10 +2,12 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div>
-      Hello
-      <Link href="connections">connections</Link><br></br>
-      <Link href="connections2">connections2</Link>
+    <div className="flex justify-center min-h-screen">
+      <Link href="connections" className=" pt-20">
+        <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 ">
+          Go to Connections
+        </button>
+      </Link>
     </div>
   );
 }
