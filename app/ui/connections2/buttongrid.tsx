@@ -1,20 +1,74 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import styles from "@/app/ui/connections/connections.module.css";
+import styles from "@/app/ui/connections2/connections.module.css";
+import clsx from "clsx";
 
 const ButtonGrid = () => {
     // The content of each box (4 sets of 4)
+    // const sets = [
+    //     ["a", "b", "c", "d"],
+    //     ["e", "f", "g", "h"],
+    //     ["i", "j", "k", "l"],
+    //     ["m", "n", "o", "p"]
+    // ];
     const sets = [
-        ["Set 1, Box 1", "Set 1, Box 2", "Set 1, Box 3", "Set 1, Box 4"],
-        ["Set 2, Box 1", "Set 2, Box 2", "Set 2, Box 3", "Set 2, Box 4"],
-        ["Set 3, Box 1", "Set 3, Box 2", "Set 3, Box 3", "Set 3, Box 4"],
-        ["Set 4, Box 1", "Set 4, Box 2", "Set 4, Box 3", "Set 4, Box 4"]
+        ["CHOCOLATE", "DONUT", "LEMONADE", "PIE"],
+        ["CUTE", "FUN", "KIND", "BEAUTIFUL"],
+        ["CHICAGO", "NORTH", "PSALM", "SAINT"],
+        ["ANTELOP", "GRAND", "KINGS", "ZION"]
     ];
+
+    const categories = [
+        "THINGS I WISH I COULD EAT",
+        "WORDS TO DESCRIBE ISABEL",
+        "KARDASHIAN KIDS",
+        "_____ CANYON"
+    ]
+
+
+    function seededShuffle(array: number[], seed: number): number[] {
+        // Simple seeded PRNG (Mulberry32)
+        function mulberry32(a: number) {
+            return function () {
+                let t = (a += 0x6D2B79F5);
+                t = Math.imul(t ^ (t >>> 15), t | 1);
+                t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+                return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+            };
+        }
+
+        let random = mulberry32(seed);
+        let shuffled = [...array];
+
+        // Fisher-Yates Shuffle using the seeded PRNG
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]; // Swap
+        }
+
+        return shuffled;
+    }
+
+    function stringToSeed(str: string): number {
+        // Simple hash function to convert the string into a numeric seed
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = (hash << 5) - hash + char;
+        }
+        return Math.abs(hash);
+    }
+
 
     //state
     const [activeBoxes, setActiveBoxes] = useState<number[]>([]); // Track active boxes
     const [completedSets, setCompletedSets] = useState<number[]>([0, 0, 0, 0]); // Track completed sets
-    const [order, setOrder] = useState<number[]>([...Array(16)].map((_, i) => i + 1)); // Box order
+    const [order, setOrder] = useState<number[]>(() => {
+        // Generate a shuffled order for all boxes (1-16)
+        let allBoxes = [...Array(16)].map((_, i) => i + 1); // [1, 2, ..., 16]
+        let seed = stringToSeed(categories[0]); // Can use the first set's name as a seed for consistent shuffling
+        return seededShuffle(allBoxes, seed); // Shuffle the boxes
+    });
     const [toggle, setToggle] = useState<Boolean>(false)
     const isFirstRender = useRef(true); // Track the first render
 
@@ -71,13 +125,12 @@ const ButtonGrid = () => {
 
             // Add the "complete" box at the correct place in the array (in order)
             updatedOrder.splice(countCompletedSets, 0, setIndex * -1); // Insert complete at the correct position
-            console.log(`updatedorder submit ${updatedOrder}`)
 
-            console.log(`order \n${order}`)
             setOrder(updatedOrder); // Update the order
-            console.log(`order \n${order}`)
             setActiveBoxes([]); // Clear active selection
             setToggle(!toggle) //cause a shuffle when toggle state is updated
+        } else if (hasThreeMatches(selectedSet)) {
+            alert("One away")
         } else {
             alert("The selected boxes do not match any set.");
         }
@@ -89,11 +142,6 @@ const ButtonGrid = () => {
         const activeOrder = order.filter((boxNumber) => boxNumber > 0); //gets all boxs which havent been completed(marked with a -1)
         const completedOrder = order.filter((boxNumber) => boxNumber <= 0);
         const shuffled = [...activeOrder];
-        console.log("shuffle start")
-        console.log(`completedSets ${completedSets}`)
-        console.log(`active order \n${activeOrder}`)
-        console.log(`completed order \n${completedOrder}`)
-        console.log(`order \n${order}`)
 
         //Fisher-yates shuffle or Knuth shuffle
         for (let i = shuffled.length - 1; i > 0; i--) {
@@ -104,14 +152,19 @@ const ButtonGrid = () => {
         // Now update the order by placing the completed boxes back in their original positions
         const updatedOrder = [...completedOrder, ...shuffled];
         setOrder(updatedOrder); // Update the order state with shuffled boxes
-        console.log(`updated order\n${updatedOrder}`)
-        console.log(`shuffled\n${shuffled}`)
-        console.log("shuffle end")
     }
 
     const deselect = () => {
         setActiveBoxes([]); // Clear active selection
     };
+
+    function hasThreeMatches(newSet: string[]) {
+        return sets.some(existingSet => {
+            // Count how many words in newSet match the existingSet
+            const matchCount = newSet.filter(word => existingSet.includes(word)).length;
+            return matchCount >= 3; // At least 3 words must match
+        });
+    }
 
     return (
         <div>
@@ -124,11 +177,21 @@ const ButtonGrid = () => {
                     return (
                         <button
                             key={boxNumber}
-                            // className={`${styles.box} ${isActive ? styles.active : ""} ${isCategory ? styles.completeRow : ""}`}
-                            className={`${isActive ? styles.active : ""} ${isCategory ? styles.completeRow : styles.box}`}
-                            onClick={() => toggleBox(boxNumber)}
+                            className={clsx(
+                                isActive && styles.active,
+                                isCategory ? styles.completeRow : styles.box,
+                                boxNumber === 0 && styles.yellow,
+                                boxNumber === -1 && styles.green,
+                                boxNumber === -2 && styles.blue,
+                                boxNumber === -3 && styles.purple
+                            )}
+                            onClick={() => {
+                                if (!isCategory) {  // Only call toggleBox if isCategory is false
+                                    toggleBox(boxNumber);
+                                }
+                            }}
                         >
-                            box{boxNumber}
+                            {isCategory ? <section><h1>{categories[-boxNumber]}</h1> {sets[-boxNumber].join(" ")}</section> : sets[Math.floor((boxNumber - 1) / 4)][(boxNumber - 1) % 4]}
                         </button>
                     );
                 })}
