@@ -51,11 +51,6 @@
     transform-origin: center;
 }
 
-.box:hover {
-    background-color: #5a594e;
-    /* Changes color on hover */
-}
-
 .box:active {
     transform: scale(.9);
 }
