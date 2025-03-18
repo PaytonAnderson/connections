@@ -1,6 +1,6 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import styles from "@/app/ui/connections2/connections.module.css";
+import { useCallback, useEffect, useRef, useState } from "react";
+import styles from "@/app/ui/connections/connections.module.css";
 import clsx from "clsx";
 
 const ButtonGrid = () => {
@@ -37,8 +37,8 @@ const ButtonGrid = () => {
             };
         }
 
-        let random = mulberry32(seed);
-        let shuffled = [...array];
+        const random = mulberry32(seed);
+        const shuffled = [...array];
 
         // Fisher-Yates Shuffle using the seeded PRNG
         for (let i = shuffled.length - 1; i > 0; i--) {
@@ -60,27 +60,47 @@ const ButtonGrid = () => {
     }
 
 
+
+
     //state
     const [activeBoxes, setActiveBoxes] = useState<number[]>([]); // Track active boxes
     const [completedSets, setCompletedSets] = useState<number[]>([0, 0, 0, 0]); // Track completed sets
     const [order, setOrder] = useState<number[]>(() => {
         // Generate a shuffled order for all boxes (1-16)
-        let allBoxes = [...Array(16)].map((_, i) => i + 1); // [1, 2, ..., 16]
-        let seed = stringToSeed(categories[0]); // Can use the first set's name as a seed for consistent shuffling
+        const allBoxes = [...Array(16)].map((_, i) => i + 1); // [1, 2, ..., 16]
+        const seed = stringToSeed(categories[0]); // Can use the first set's name as a seed for consistent shuffling
         return seededShuffle(allBoxes, seed); // Shuffle the boxes
     });
-    const [toggle, setToggle] = useState<Boolean>(false)
-    const isFirstRender = useRef(true); // Track the first render
+    const [toggle, setToggle] = useState<boolean>(false)
+    const hasShuffled = useRef(false);  // Track if shuffle has already happened
 
-    useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false; // Skip the effect during the first render
-            return; // Prevent the effect from running on the first render
+    const shuffleBoxes = useCallback(() => {
+        const activeOrder = order.filter((boxNumber) => boxNumber > 0); //gets all boxs which havent been completed(marked with a -1)
+        const completedOrder = order.filter((boxNumber) => boxNumber <= 0);
+        const shuffled = [...activeOrder];
+
+        //Fisher-yates shuffle or Knuth shuffle
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]; // Swap elements
         }
 
-        // Your effect logic, will run when `toggle` changes after the first render
-        shuffleBoxes();
-    }, [toggle]); // Runs when `toggle` changes
+        // Now update the order by placing the completed boxes back in their original positions
+        const updatedOrder = [...completedOrder, ...shuffled];
+        setOrder(updatedOrder); // Update the order state with shuffled boxes
+    }, [order])
+
+    useEffect(() => {
+        if (hasShuffled.current) {
+            return;  // Do nothing if shuffle has already been performed
+        }
+
+        if (toggle) {
+            console.log("shuffling")
+            shuffleBoxes();  // Shuffle the boxes when `toggle` changes
+            setToggle(!toggle)
+        }
+    }, [toggle, shuffleBoxes]);
 
     const toggleBox = (boxNumber: number) => {
         setActiveBoxes((prev) => {
@@ -137,23 +157,6 @@ const ButtonGrid = () => {
 
     }
 
-    const shuffleBoxes = () => {
-        const countCompletedSets = completedSets.filter((set) => set != 0).length
-        const activeOrder = order.filter((boxNumber) => boxNumber > 0); //gets all boxs which havent been completed(marked with a -1)
-        const completedOrder = order.filter((boxNumber) => boxNumber <= 0);
-        const shuffled = [...activeOrder];
-
-        //Fisher-yates shuffle or Knuth shuffle
-        for (let i = shuffled.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]; // Swap elements
-        }
-
-        // Now update the order by placing the completed boxes back in their original positions
-        const updatedOrder = [...completedOrder, ...shuffled];
-        setOrder(updatedOrder); // Update the order state with shuffled boxes
-    }
-
     const deselect = () => {
         setActiveBoxes([]); // Clear active selection
     };
@@ -170,7 +173,7 @@ const ButtonGrid = () => {
         <div>
             <div className={styles.container}>
                 {/* Render the boxes */}
-                {order.map((boxNumber, index) => {
+                {order.map((boxNumber) => {
                     // Check if it's a "complete" box in the order array
                     const isActive = activeBoxes.includes(boxNumber);
                     const isCategory = boxNumber <= 0
